@@ -74,7 +74,8 @@ class Character:
     def __init__(self, name, attribute, hp, attack, defense, 
                  is_enemy=False, links=None, is_leader=False, 
                  categories=None, evasion=EvasionLevel.NONE,
-                 is_lr=False, passive_skills=None, super_attack_effects=None):
+                 is_lr=False, passive_skills=None, super_attack_effects=None,
+                 active_skill=None):  # Added active_skill parameter
         self.name = name
         if isinstance(attribute, str):
             for attr_enum in Attribute:
@@ -124,6 +125,20 @@ class Character:
             "stun_chance": 0,
             "additional_effects": []
         }
+        # Active skill properties
+        self.active_skill = active_skill or {}
+        self.active_skill_used = False
+        self.domain_active = False
+        self.omnipresent = False
+        self.domain_turns_remaining = 0
+        self.clones_active = False
+        self.clones_turns_remaining = 0
+        self.critical_hit_active = False
+        self.critical_turns_remaining = 0
+        self.atk_boost_active = False
+        self.atk_boost_turns_remaining = 0
+        self.def_boost_active = False
+        self.def_boost_turns_remaining = 0
         
         # Other attributes
         self.active_skill_used = False; self.exchange_available = False; self.turn_count = 0
@@ -156,10 +171,22 @@ class Character:
         self.link_atk_buff = 0
         self.link_ki_buff = 0
         self.link_evasion_buff = 0
+        
+        # Update domain and clone durations
         if self.domain_active:
             self.domain_turns_remaining -= 1
             if self.domain_turns_remaining <= 0:
-                self.domain_active = False; self.omnipresent = False
+                self.domain_active = False
+                self.omnipresent = False
+        
+        if self.clones_active:
+            self.clones_turns_remaining -= 1
+            if self.clones_turns_remaining <= 0:
+                self.clones_active = False
+        
+        # Reset temporary boosts
+        self.atk_boost_active = False
+        self.critical_hit_active = False
 
     def apply_passive_skills(self):
         """Apply passive skills at turn start"""
@@ -218,16 +245,17 @@ class Character:
     def normal_attack(self):
         return self.get_final_attack()
 
-    def super_attack(self):
-        base_attack = self.get_final_attack() * 2
-        # Apply super attack effects
-        self.atk_buff += self.super_attack_effects["atk_up"]
-        self.def_buff += self.super_attack_effects["def_up"]
+    def get_final_attack(self):
+        """Calculate final attack with all buffs"""
+        passive_multiplier = 1 + self.atk_buff / 100
+        link_multiplier = 1 + self.link_atk_buff / 100
+        base_attack = self.base_attack * passive_multiplier * link_multiplier + self.permanent_atk_buff
         
-        # Stun chance
-        if self.super_attack_effects["stun_chance"] > 0 and random.randint(1, 100) <= self.super_attack_effects["stun_chance"]:
-            return base_attack, "stun"
-        return base_attack, ""
+        # Apply active skill ATK boost if active
+        if self.atk_boost_active:
+            base_attack *= 2.5  # Massive ATK boost
+            
+        return base_attack
 
     def ultra_super_attack(self):
         base_attack = self.get_final_attack() * 3
@@ -268,6 +296,8 @@ class Character:
 
     def try_critical(self):
         """Attempt critical hit"""
+        if self.critical_hit_active:
+            return True  # Guaranteed critical from active skill
         if self.critical_hit_chance <= 0:
             return False
         return random.randint(1, 100) <= self.critical_hit_chance
@@ -275,9 +305,109 @@ class Character:
     def is_alive(self): 
         return self.hp > 0
 
-    def use_active_skill(self):
-        # Active skill implementation remains the same
-        pass
+    def use_active_skill(self, battle_system):
+        """Use active skill with battle context"""
+        if not self.active_skill:
+            return "No active skill available", 0
+        
+        if self.active_skill_used:
+            return "Active skill already used", 0
+        
+        # Check conditions
+        condition_met = False
+        if "Terrifying Zero Mortals Plan" in self.name:
+            condition_met = battle_system.turn_count >= 4
+        elif "Infinite Sanctuary" in self.name:
+            condition_met = (battle_system.turn_count >= 5 and self.hp <= self.max_hp * 0.7) or \
+                            (battle_system.turn_count >= 7 and any(
+                                char for char in battle_system.player_team.rotation 
+                                if char != self and Category.FUTURE_SAGA in char.categories
+                            ))
+        elif "Dawn of an Ideal World" in self.name:
+            condition_met = self.super_attacks_performed >= 5
+        elif "Mark of Almighty Power" in self.name:
+            condition_met = battle_system.turn_count >= 6 and self.hp <= self.max_hp * 0.66
+        elif "Mastery of the Power of Rage" in self.name:
+            condition_met = (battle_system.turn_count >= 4 and all(
+                char for char in battle_system.player_team.rotation 
+                if char != self and Category.SUPER_BOSSES in char.categories
+            )) or battle_system.turn_count >= 6
+        
+        if not condition_met:
+            return "Active skill conditions not met", 0
+        
+        self.active_skill_used = True
+        
+        # Apply effects
+        effect_message = ""
+        effect_damage = 0
+        
+        if "Terrifying Zero Mortals Plan" in self.name:
+            # Massively raises ATK temporarily
+            self.atk_boost_active = True
+            self.atk_boost_turns_remaining = 1  # For current attack only
+            
+            # Causes ultimate damage (calculated in attack)
+            effect_damage = self.get_final_attack() * 10
+            
+            # All attacks become critical hits
+            self.critical_hit_active = True
+            self.critical_turns_remaining = 1  # For current turn only
+            
+            # Apply team buffs
+            for char in battle_system.player_team.members:
+                if Category.SUPER_BOSSES in char.categories:
+                    char.atk_buff += 15
+                    if Category.FUTURE_SAGA in char.categories:
+                        char.def_buff += 10
+            effect_message = "Holy Light Grenade! Massively raises ATK, causes ultimate damage, all attacks critical this turn. Super Bosses Category allies buffed!"
+        
+        elif "Infinite Sanctuary" in self.name:
+            # Create domain
+            self.domain_active = True
+            self.domain_turns_remaining = 5
+            self.omnipresent = True
+            
+            # Raise Extreme Class allies' Ki by 3
+            for char in battle_system.player_team.members:
+                if char != self:  # Assuming self is Extreme Class
+                    char.ki = min(24, char.ki + 3)
+            effect_message = "Omnipresence! Domain 'Infinite Zamasu' created. Extreme Class allies' Ki +3. Character becomes omnipresent for 5 turns."
+        
+        elif "Dawn of an Ideal World" in self.name:
+            # Massively raises ATK temporarily
+            self.atk_boost_active = True
+            self.atk_boost_turns_remaining = 1  # For current attack only
+            
+            # Causes ultimate damage
+            effect_damage = self.get_final_attack() * 8
+            
+            # Stun the enemy
+            # (Will be applied in attack)
+            effect_message = "Lightning of Absolution! Massively raises ATK, causes ultimate damage, and stuns the enemy."
+        
+        elif "Mark of Almighty Power" in self.name:
+            # Rage effect - increase stats
+            self.atk_buff += 50
+            self.def_buff += 30
+            effect_message = "Rage! ATK +50%, DEF +30% for the rest of the battle."
+        
+        elif "Mastery of the Power of Rage" in self.name:
+            # Create domain
+            self.domain_active = True
+            self.domain_turns_remaining = 4
+            
+            # Raise Super Bosses Category allies' Ki by 2
+            for char in battle_system.player_team.members:
+                if Category.SUPER_BOSSES in char.categories:
+                    char.ki = min(24, char.ki + 2)
+            
+            # Create clones
+            self.clones_active = True
+            self.clones_turns_remaining = 4
+            effect_message = "Time Rift of Wrath! Domain 'City (Future) (Rift in Time)' created. Super Bosses allies' Ki +2. Clones created for 4 turns."
+        
+        return effect_message, effect_damage
 
     def take_damage(self, damage):
         # Account for damage reduction (character's own passive)
@@ -876,6 +1006,46 @@ class BattleSystem:
                 continue
             
             if choice == active_skill_option:
+                effect_message, effect_damage = player_char.use_active_skill(self)
+                self.display_battle_state()
+                print(f"\n{effect_message}")
+                
+                if effect_damage > 0:
+                    # Active skill causes damage - need to choose target
+                    print("\nChoose target for active skill:")
+                    alive_enemies = {i: enemy for i, enemy in enumerate(self.enemy_team.members) if enemy.is_alive()}
+                    for i, enemy in alive_enemies.items():
+                        print(f"{i}. {enemy.name} ({enemy.attribute.value}) | HP: {enemy.hp:,.0f}")
+                    
+                    try:
+                        target_index = int(input("Target: "))
+                        if target_index in alive_enemies:
+                            target = alive_enemies[target_index]
+                        else:
+                            target = next(iter(alive_enemies.values()))
+                    except:
+                        target = next(iter(alive_enemies.values()))
+                    
+                    # Check evasion
+                    if target.try_evade():
+                        print(f"{target.name} evaded the active skill!")
+                    else:
+                        # Calculate damage
+                        type_multiplier = self.get_type_multiplier(player_char.attribute, target.attribute)
+                        final_damage = int(effect_damage * type_multiplier)
+                        actual_damage = target.take_damage(final_damage)
+                        
+                        print(f"Dealt {actual_damage:,.0f} damage!")
+                        if not target.is_alive():
+                            print(f"{target.name} defeated!")
+                        
+                        # Apply stun effect if applicable
+                        if "Dawn of an Ideal World" in player_char.name:
+                            print(f"{target.name} is stunned for the next turn!")
+                            target.status_effects[StatusEffect.STUN] = 1
+                
+                self.press_any_key()
+                return
                 result = player_char.use_active_skill()
                 # Check for None and type
                 if isinstance(result, tuple): 
