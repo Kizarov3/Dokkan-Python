@@ -256,16 +256,32 @@ class Character:
             base_attack *= 2.5  # Massive ATK boost
             
         return base_attack
+    def super_attack(self):
+        """Super attack implementation for both player and enemy characters"""
+        base_attack = self.get_final_attack() * 2
+        # Apply super attack effects if they exist
+        if hasattr(self, 'super_attack_effects'):
+            self.atk_buff += self.super_attack_effects.get("atk_up", 0)
+            self.def_buff += self.super_attack_effects.get("def_up", 0)
+            
+            # Stun chance
+            stun_chance = self.super_attack_effects.get("stun_chance", 0)
+            if stun_chance > 0 and random.randint(1, 100) <= stun_chance:
+                return base_attack, "stun"
+        return base_attack, ""
 
     def ultra_super_attack(self):
+        """Ultra super attack for LR characters"""
         base_attack = self.get_final_attack() * 3
-        # Apply super attack effects
-        self.atk_buff += self.super_attack_effects["atk_up"]
-        self.def_buff += self.super_attack_effects["def_up"]
-        
-        # Stun chance
-        if self.super_attack_effects["stun_chance"] > 0 and random.randint(1, 100) <= self.super_attack_effects["stun_chance"]:
-            return base_attack, "stun"
+        # Apply super attack effects if they exist
+        if hasattr(self, 'super_attack_effects'):
+            self.atk_buff += self.super_attack_effects.get("atk_up", 0)
+            self.def_buff += self.super_attack_effects.get("def_up", 0)
+            
+            # Stun chance
+            stun_chance = self.super_attack_effects.get("stun_chance", 0)
+            if stun_chance > 0 and random.randint(1, 100) <= stun_chance:
+                return base_attack, "stun"
         return base_attack, ""
 
     def dokkan_attack(self):
@@ -896,11 +912,17 @@ class BattleSystem:
                 is_super_attack = True
             
             if is_super_attack:
-                damage = attacker.super_attack()[0]
-                attack_type = "SUPER ATTACK"
+                # Use super attack if available, otherwise use ultra or normal
+                if hasattr(attacker, 'is_lr') and attacker.is_lr:
+                    damage, effect = attacker.ultra_super_attack()
+                    attack_type = "ULTRA SUPER ATTACK"
+                else:
+                    damage, effect = attacker.super_attack()
+                    attack_type = "SUPER ATTACK"
             else:
                 damage = attacker.normal_attack()
                 attack_type = "normal attack"
+                effect = ""
             
             # Check evasion
             if target_char.try_evade():
@@ -925,8 +947,8 @@ class BattleSystem:
                 
             print(f"Base Damage: {final_damage:,.0f} | Actual Damage: {actual_damage:,.0f}")
             
-            # Check for stun
-            if is_super_attack and random.random() < 0.2:  # 20% stun chance from super attack
+            # Apply stun effect
+            if effect == "stun":
                 print(f"{target_char.name} is stunned for the next turn!")
                 target_char.status_effects[StatusEffect.STUN] = 1
             
@@ -1508,7 +1530,23 @@ def create_goku_black_characters():
 
 def start_new_battle():
     enemy_team = Team()
-    vegeta = Character("Super Saiyan God SS Vegeta", Attribute.STR, 12000000, 370000, 150000, is_enemy=True)
+    
+    # Create enemy character with proper attributes
+    vegeta = Character(
+        "Super Saiyan God SS Vegeta", 
+        Attribute.STR, 
+        12000000, 
+        370000, 
+        150000, 
+        is_enemy=True,
+        super_attack_effects={  # Proper super attack effects
+            "atk_up": 0,
+            "def_up": 0,
+            "stun_chance": 20,
+            "additional_effects": []
+        }
+    )
+    
     vegeta.damage_reduction = 66
     vegeta.max_attacks_per_turn = 3
     enemy_team.add_member(vegeta)
@@ -1520,7 +1558,28 @@ def start_new_battle():
     for char in black_characters:
         player_team.add_member(char, enemy_team.members)
     
-    # Set leader - use the first character as leader
+    # Add two more characters for full team
+    player_team.add_member(Character(
+        name="Fusion Zamasu",
+        attribute=Attribute.INT,
+        hp=2300000,
+        attack=17000,
+        defense=13000,
+        links=["Fused Fighter", "Godly Power"],
+        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS]
+    ), enemy_team.members)
+    
+    player_team.add_member(Character(
+        name="Goku Black (Base)",
+        attribute=Attribute.PHY,
+        hp=2100000,
+        attack=16000,
+        defense=11000,
+        links=["Prodigies", "Cold Judgment"],
+        categories=[Category.FUTURE_SAGA]
+    ), enemy_team.members)
+    
+    # Set leader
     player_team.members[0].is_leader = True
     player_team.apply_leader_skill(player_team.members[0])
     
