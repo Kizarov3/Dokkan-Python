@@ -1340,41 +1340,143 @@ def show_game_info():
 def create_goku_black_characters():
     characters = []
     
-    # Rose Stained Super Saiyan
+    # Terrifying Zero Mortals Plan (Goku Black + Zamasu)
     characters.append(Character(
-        name="Rose Stained Super Saiyan Goku Black (Super Saiyan Rosé)",
-        attribute=Attribute.AGL,
-        hp=2500000,
-        attack=18000,
-        defense=12000,
-        links=["Super Saiyan", "Fear and Faith", "Nightmare", "Prepared for Battle", 
-               "Dismal Future", "Big Bad Bosses", "Fierce Battle"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        name="Terrifying Zero Mortals Plan Goku Black (Super Saiyan Rosé) + Zamasu",
+        attribute=Attribute.STR,
+        hp=2800000,
+        attack=21000,
+        defense=16000,
+        links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith", 
+               "Nightmare", "Dismal Future", "Fierce Battle"],
+        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS, Category.SUPER_BOSSES],
         evasion=EvasionLevel.MEDIUM,
         is_lr=True,
         passive_skills={
             "additional_attack": 30,
-            "critical_hit_chance": 50,
+            "critical_hit_chance": 60,
             "dodge_chance": 20,
-            "damage_reduction": 20,
+            "damage_reduction": 25,
             "guard_chance": 0,
             "atk_per_super": 20,
-            "def_per_super": 10,
+            "def_per_super": 15,
         },
         super_attack_effects={
             "atk_up": 30,
             "def_up": 20,
             "stun_chance": 30,
             "additional_effects": []
+        },
+        active_skill={
+            "name": "Holy Light Grenade",
+            "description": "Massively raises ATK temporarily, causes ultimate damage, all attacks critical, buffs allies"
+        }
+    ))
+    
+    # Infinite Sanctuary (Fusion Zamasu)
+    characters.append(Character(
+        name="Infinite Sanctuary Fusion Zamasu",
+        attribute=Attribute.TEQ,
+        hp=3200000,
+        attack=19000,
+        defense=18000,
+        links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith"],
+        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        evasion=EvasionLevel.HIGH,
+        is_lr=True,
+        passive_skills={
+            "additional_attack": 20,
+            "critical_hit_chance": 40,
+            "dodge_chance": 15,
+            "damage_reduction": 30,
+            "guard_chance": 0,
+            "atk_per_super": 15,
+            "def_per_super": 20,
+        },
+        super_attack_effects={
+            "atk_up": 25,
+            "def_up": 30,
+            "stun_chance": 20,
+            "additional_effects": []
+        },
+        active_skill={
+            "name": "Omnipresence",
+            "description": "Creates Domain, raises Extreme Class Ki, becomes omnipresent"
+        }
+    ))
+    
+    # Dawn of an Ideal World (Fusion Zamasu)
+    # Note: Different version of Fusion Zamasu
+    characters.append(Character(
+        name="Dawn of an Ideal World Fusion Zamasu",
+        attribute=Attribute.INT,
+        hp=3000000,
+        attack=22000,
+        defense=15000,
+        links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith"],
+        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        evasion=EvasionLevel.MEDIUM,
+        is_lr=False,
+        passive_skills={
+            "additional_attack": 25,
+            "critical_hit_chance": 50,
+            "dodge_chance": 10,
+            "damage_reduction": 20,
+            "guard_chance": 0,
+            "atk_per_super": 25,
+            "def_per_super": 15,
+        },
+        super_attack_effects={
+            "atk_up": 35,
+            "def_up": 25,
+            "stun_chance": 25,
+            "additional_effects": []
+        },
+        active_skill={
+            "name": "Lightning of Absolution",
+            "description": "Massively raises ATK, causes ultimate damage, stuns enemy"
+        }
+    ))
+    
+    # Mark of Almighty Power
+    characters.append(Character(
+        name="Mark of Almighty Power Goku Black (Super Saiyan Rosé)",
+        attribute=Attribute.INT,
+        hp=2600000,
+        attack=23000,
+        defense=13000,
+        links=["Super Saiyan", "Fear and Faith", "Kamehameha", "Dismal Future", 
+               "Big Bad Bosses", "Fierce Battle", "Legendary Power"],
+        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        evasion=EvasionLevel.RARE,
+        is_lr=False,
+        passive_skills={
+            "additional_attack": 10,
+            "critical_hit_chance": 30,
+            "dodge_chance": 40,
+            "damage_reduction": 15,
+            "guard_chance": 0,
+            "atk_per_super": 25,
+            "def_per_super": 5,
+        },
+        super_attack_effects={
+            "atk_up": 25,
+            "def_up": 15,
+            "stun_chance": 25,
+            "additional_effects": []
+        },
+        active_skill={
+            "name": "Rage",
+            "description": "Rages, increasing ATK and DEF significantly"
         }
     ))
     
     # Mastery of the Power of Rage
     characters.append(Character(
         name="Mastery of the Power of Rage Goku Black (Super Saiyan Rosé)",
-        attribute=Attribute.INT,
+        attribute=Attribute.PHY,
         hp=2700000,
-        attack=20000,
+        attack=24000,
         defense=14000,
         links=["Super Saiyan", "Big Bad Bosses", "Dismal Future", "Prepared for Battle", 
                "Nightmare", "Fear and Faith", "Fierce Battle"],
@@ -1395,64 +1497,10 @@ def create_goku_black_characters():
             "def_up": 10,
             "stun_chance": 20,
             "additional_effects": []
-        }
-    ))
-    
-    # Mark of Almighty Power
-    characters.append(Character(
-        name="Mark of Almighty Power Goku Black (Super Saiyan Rosé)",
-        attribute=Attribute.TEQ,
-        hp=2300000,
-        attack=22000,
-        defense=10000,
-        links=["Super Saiyan", "Fear and Faith", "Kamehameha", "Dismal Future", 
-               "Big Bad Bosses", "Fierce Battle", "Legendary Power"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
-        evasion=EvasionLevel.RARE,
-        is_lr=False,
-        passive_skills={
-            "additional_attack": 10,
-            "critical_hit_chance": 30,
-            "dodge_chance": 40,
-            "damage_reduction": 15,
-            "guard_chance": 0,
-            "atk_per_super": 25,
-            "def_per_super": 5,
         },
-        super_attack_effects={
-            "atk_up": 25,
-            "def_up": 15,
-            "stun_chance": 25,
-            "additional_effects": []
-        }
-    ))
-    
-    # Furious Punishment
-    characters.append(Character(
-        name="Furious Punishment Goku Black (Super Saiyan Rosé)",
-        attribute=Attribute.PHY,
-        hp=2600000,
-        attack=19000,
-        defense=15000,
-        links=["Super Saiyan", "Fear and Faith", "Nightmare", "Prepared for Battle", 
-               "Dismal Future", "Big Bad Bosses", "Fierce Battle"],
-        categories=[Category.REALM_OF_GODS, Category.ACCELERATED_BATTLE],
-        evasion=EvasionLevel.GREAT,
-        is_lr=False,
-        passive_skills={
-            "additional_attack": 15,
-            "critical_hit_chance": 40,
-            "dodge_chance": 30,
-            "damage_reduction": 25,
-            "guard_chance": 0,
-            "atk_per_super": 15,
-            "def_per_super": 20,
-        },
-        super_attack_effects={
-            "atk_up": 20,
-            "def_up": 30,
-            "stun_chance": 15,
-            "additional_effects": []
+        active_skill={
+            "name": "Time Rift of Wrath",
+            "description": "Creates Domain, raises allies' Ki, creates clones"
         }
     ))
     
@@ -1472,28 +1520,7 @@ def start_new_battle():
     for char in black_characters:
         player_team.add_member(char, enemy_team.members)
     
-    # Add two more characters for full team
-    player_team.add_member(Character(
-        name="Fusion Zamasu",
-        attribute=Attribute.INT,
-        hp=2300000,
-        attack=17000,
-        defense=13000,
-        links=["Fused Fighter", "Godly Power"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS]
-    ), enemy_team.members)
-    
-    player_team.add_member(Character(
-        name="Goku Black (Base)",
-        attribute=Attribute.PHY,
-        hp=2100000,
-        attack=16000,
-        defense=11000,
-        links=["Prodigies", "Cold Judgment"],
-        categories=[Category.FUTURE_SAGA]
-    ), enemy_team.members)
-    
-    # Set leader
+    # Set leader - use the first character as leader
     player_team.members[0].is_leader = True
     player_team.apply_leader_skill(player_team.members[0])
     
