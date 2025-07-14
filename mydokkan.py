@@ -66,7 +66,7 @@ class Character:
         self.base_defense = defense
         self.attack = attack
         self.defense = defense
-        self.ki = 0
+        self._ki = 0  # Используем приватную переменную для контроля ограничения
         self.is_enemy = is_enemy
         self.links = links or []
         self.is_leader = is_leader
@@ -84,6 +84,16 @@ class Character:
         self.entry_turn = 0; self.super_attacks_performed = 0; self.attacks_received = 0
         self.ki_sphere_bonus = 0; self.domain_active = False; self.omnipresent = False
         self.domain_turns_remaining = 0
+
+    # Добавляем геттер/сеттер для контроля Ki
+    @property
+    def ki(self):
+        return self._ki
+    
+    @ki.setter
+    def ki(self, value):
+        # Ограничиваем Ki максимум 24
+        self._ki = max(0, min(value, 24))
 
     def start_turn_reset(self):
         """Сброс временных баффов в начале хода"""
@@ -166,6 +176,8 @@ class Character:
             self.omnipresent = True
             self.domain_turns_remaining = 5
             return 0, "Omnipresence! Creates the Domain 'Infinite Zamasu'!"
+        # Добавлен возврат по умолчанию
+        return "No active skill available for this character."
 
     def apply_passives(self, team):
         if "Dawn of an Ideal World" in self.name:
@@ -177,6 +189,7 @@ class Character:
             if self.ki >= 18: self.additional_attack_chance = 100
             if self.ki >= 24: self.effective_against_all = True
             self.damage_reduction += min(self.attacks_received, 5) * 2
+            # Ограничиваем Ki при добавлении
             self.ki += min(self.attacks_received // 5, 5)
         elif "Infinite Sanctuary" in self.name:
             self.ki += 6
@@ -184,14 +197,20 @@ class Character:
             self.def_buff = 100
             self.damage_reduction = 40
             self.critical_hit_chance = 70
-            if not any(Category.REALM_OF_GODS in enemy.categories for enemy in team.enemies):
-                self.ki += 3
-                self.atk_buff += 50
-                self.def_buff += 50
+            
+            # ИСПРАВЛЕНИЕ: Проверка на наличие врагов перед итерацией
+            if team.enemies:
+                if not any(Category.REALM_OF_GODS in enemy.categories for enemy in team.enemies):
+                    self.ki += 3
+                    self.atk_buff += 50
+                    self.def_buff += 50
+            
             self.def_buff += 50
-            if self.hp <= self.max_hp * 0.7: self.def_buff += 50
+            if self.hp <= self.max_hp * 0.7: 
+                self.def_buff += 50
             self.additional_attack_chance = 80
             self.atk_buff += min(self.attacks_received * 25, 150)
+        
         self.attack = self.base_attack * (1 + self.atk_buff / 100)
         self.defense = self.base_defense * (1 + self.def_buff / 100)
 
@@ -244,10 +263,14 @@ class Team:
                 reduction_value = self.active_item_effects['damage_reduction']['value']
                 modified_damage *= (1 - reduction_value / 100.0)
             if 'def_boost' in self.active_item_effects:
-                def_boost_value = 50
+                # Исправление: используем значение из эффекта
+                def_boost_value = self.active_item_effects['def_boost']['value']
                 modified_damage *= (1 - (def_boost_value * 0.5) / 100.0)
 
-            self.total_hp = max(0, self.total_hp - int(modified_damage))
+            actual_damage = int(modified_damage)
+            self.total_hp = max(0, self.total_hp - actual_damage)
+            return actual_damage  # Возвращаем фактический урон
+        return damage  # Для врагов не обрабатываем
 
     def apply_leader_skill(self, leader):
         initial_max_hp = sum(m.max_hp for m in self.members)
@@ -311,8 +334,9 @@ class BattleSystem:
         self.player_team = player_team
         self.enemy_team = enemy_team
         self.turn_count = 0
+        # ИСПРАВЛЕНИЕ: Ghost Usher теперь 2
         self.inventory = {
-            SupportItem.GHOST_USHER: 1,
+            SupportItem.GHOST_USHER: 2,
             SupportItem.ANDROID_8: 2,
             SupportItem.PRINCESS_SNAKE: 2,
             SupportItem.WHIS: 2,
@@ -352,8 +376,9 @@ class BattleSystem:
             elif sphere.attribute == character.attribute: collected_ki += 2
             else: collected_ki += 1
         
+        # Ограничиваем Ki максимум 24
         character.ki += collected_ki
-        print(f"\n+ {collected_ki} Ki from spheres!")
+        print(f"\n+ {collected_ki} Ki from spheres! (Total: {character.ki}/24)")
         self.generate_ki_field()
         self.press_any_key()
 
@@ -381,24 +406,34 @@ class BattleSystem:
         # Сбор Ki с поля
         self.collect_ki(player_char)
         
-        # Добавляем Ki от линков
+        # Добавляем Ki от линков (с ограничением)
         player_char.ki += player_char.link_ki_buff
 
-        # Применение пассивок
+        # Применение пассивок с проверкой
         if "Zamasu" in player_char.name or "Goku Black" in player_char.name:
+            # Убедимся, что враги установлены
+            if not self.enemy_team.members:
+                self.enemy_team.members = []
             player_char.apply_passives(self.player_team)
 
         # Выбор действия
         while True:
             self.display_battle_state()
             print(f"\n{player_char.name}'s turn! (Final ATK: {player_char.get_final_attack():,.0f})")
-            print(f"Current Ki: {player_char.ki}")
+            print(f"Current Ki: {player_char.ki}/24")
 
             print("\n1. Attack")
             print("2. Use Support Item")
             
+            # Определяем доступные опции на основе Ki
             action_index = 3
-            if player_char.turn_count >= 4 and not player_char.active_skill_used and ("Goku Black" in player_char.name or "Zamasu" in player_char.name):
+            show_active_skill = (
+                player_char.turn_count >= 4 and 
+                not player_char.active_skill_used and 
+                ("Goku Black" in player_char.name or "Zamasu" in player_char.name)
+            )
+            
+            if show_active_skill:
                 print(f"{action_index}. Use Active Skill")
                 active_skill_option = action_index
                 action_index += 1
@@ -408,7 +443,8 @@ class BattleSystem:
             try:
                 choice = int(input("Your choice: "))
             except ValueError:
-                choice = -1
+                print("Invalid input. Please enter a number.")
+                continue
             
             if choice == 2:
                 self.use_support_item()
@@ -416,12 +452,17 @@ class BattleSystem:
             
             if choice == active_skill_option:
                 result = player_char.use_active_skill()
+                # ИСПРАВЛЕНИЕ: Проверка на None и тип
                 if isinstance(result, tuple): 
                     damage, msg = result
-                else: 
+                elif isinstance(result, str): 
                     msg = result
                     damage = 0
+                else:
+                    msg = "No active skill available"
+                    damage = 0
                 
+                # Исправленная проверка
                 if "not available" in msg:
                     print(msg)
                     self.press_any_key()
@@ -439,10 +480,12 @@ class BattleSystem:
                     
                     try:
                         target_index = int(input("Target: "))
-                        target = self.enemy_team.members[target_index]
-                        if not target.is_alive(): raise ValueError
+                        # ПРЯМОЕ ИСПРАВЛЕНИЕ ОШИБКИ: выбор цели без сообщения об ошибке
+                        if target_index in alive_enemies:
+                            target = alive_enemies[target_index]
+                        else:
+                            target = next(iter(alive_enemies.values()))
                     except:
-                        print("Invalid target! Selecting first enemy.")
                         target = next(iter(alive_enemies.values()))
                     
                     # Нанесение урона
@@ -462,6 +505,9 @@ class BattleSystem:
             if choice == 1:
                 self.perform_attack(player_char)
                 return
+            else:
+                print("Invalid choice. Please select again.")
+                self.press_any_key()
 
     def perform_attack(self, player_char):
         # Определение типа атаки по количеству Ki
@@ -491,10 +537,11 @@ class BattleSystem:
         
         try:
             target_index = int(input("Target: "))
-            target = self.enemy_team.members[target_index]
-            if not target.is_alive(): raise ValueError
+            if target_index in alive_enemies:
+                target = alive_enemies[target_index]
+            else:
+                target = next(iter(alive_enemies.values()))
         except:
-            print("Invalid target! Selecting first enemy.")
             target = next(iter(alive_enemies.values()))
             
         # Расчет урона
@@ -540,24 +587,31 @@ class BattleSystem:
     def use_support_item(self):
         self.clear_screen()
         print("===== SUPPORT ITEMS =====\n")
-        item_map = {i + 1: item for i, item in enumerate(self.inventory) if self.inventory[item] > 0}
         
-        if not item_map:
+        # Создаем список доступных предметов
+        available_items = []
+        for item, count in self.inventory.items():
+            if count > 0:
+                available_items.append(item)
+        
+        if not available_items:
             print("No items left!")
             self.press_any_key()
             return
         
-        for index, item in item_map.items():
-            print(f"{index}. {item.value} (x{self.inventory[item]})")
+        # Отображаем доступные предметы
+        for i, item in enumerate(available_items):
+            print(f"{i+1}. {item.value} (x{self.inventory[item]})")
         
-        cancel_option = len(item_map) + 1
+        cancel_option = len(available_items) + 1
         print(f"\n{cancel_option}. Cancel")
 
         try:
             choice = int(input("\nChoose item to use: "))
-            if choice == cancel_option: return
-            selected_item = item_map[choice]
-        except (ValueError, KeyError):
+            if choice == cancel_option: 
+                return
+            selected_item = available_items[choice-1]
+        except (ValueError, IndexError):
             print("Invalid input.")
             self.press_any_key()
             return
@@ -598,6 +652,7 @@ class BattleSystem:
                 status_line = f"[{i}] {member.name} ({member.attribute.value}) | HP: {member.hp:,.0f}"
                 buffs = [f"ATK↑{member.atk_buff}%" for _ in range(1) if member.atk_buff > 0]
                 buffs.extend([f"DEF↑{member.def_buff}%" for _ in range(1) if member.def_buff > 0])
+
                 buffs.extend([f"DMG RED↓{member.damage_reduction}%" for _ in range(1) if member.damage_reduction > 0])
                 if buffs: status_line += " | " + ", ".join(buffs)
                 print(status_line)
@@ -607,13 +662,16 @@ class BattleSystem:
             print(f"Team HP: {team.total_hp:,.0f} / {team.max_hp:,.0f}")
             if team.domain_active: print("DOMAIN ACTIVE: Infinite Zamasu")
             
+            # ИСПРАВЛЕНИЕ: Отображение ВСЕХ баффов от предметов
             active_effects = []
-            if 'damage_reduction' in team.active_item_effects:
-                fx = team.active_item_effects['damage_reduction']
-                active_effects.append(f"DMG Reduction {fx['value']}% ({fx['turns']} turns)")
-            if 'def_boost' in team.active_item_effects:
-                fx = team.active_item_effects['def_boost']
-                active_effects.append(f"DEF Boost {fx['value']}% ({fx['turns']} turns)")
+            for effect_name, effect_data in team.active_item_effects.items():
+                if effect_name == 'damage_reduction':
+                    desc = f"DMG Reduction {effect_data['value']}%"
+                elif effect_name == 'def_boost':
+                    desc = f"DEF Boost {effect_data['value']}%"
+                else:
+                    desc = effect_name
+                active_effects.append(f"{desc} ({effect_data['turns']} turns)")
             if active_effects:
                 print(f"ACTIVE ITEM EFFECTS: {', '.join(active_effects)}")
 
@@ -639,9 +697,12 @@ class BattleSystem:
             random_player_char = random.choice(alive_players)
             damage = enemy.normal_attack() * self.get_type_multiplier(enemy.attribute, random_player_char.attribute)
             
+            # Учитываем эффекты защиты
+            actual_damage = self.player_team.take_damage(damage)
+            
+            self.display_battle_state()
             print(f"\n{enemy.name} attacks your team!")
-            self.player_team.take_damage(damage)
-            print(f"Your team takes {int(damage):,.0f} damage!")
+            print(f"Base Damage: {int(damage):,.0f} | Actual Damage: {int(actual_damage):,.0f}")
             self.press_any_key()
 
             if not self.player_team.has_alive_members():
@@ -689,26 +750,34 @@ def main_menu():
         print("1. Start New Battle")
         print("2. View Game Info")
         print("3. Exit")
-        try: choice = int(input("\nYour choice: "))
-        except ValueError: continue
-        if choice == 1: start_new_battle()
-        elif choice == 2: show_game_info()
-        elif choice == 3: print("\nThanks for playing!"); break
+        try: 
+            choice = int(input("\nYour choice: "))
+        except ValueError: 
+            continue
+        if choice == 1: 
+            start_new_battle()
+        elif choice == 2: 
+            show_game_info()
+        elif choice == 3: 
+            print("\nThanks for playing!")
+            break
 
 def show_game_info():
     BattleSystem.clear_screen()
     print("===== GAME INFORMATION =====")
-    print("\nSupport Items:")
+    print("\nKi Spheres: Collect to launch Super Attacks (12 Ki) or Ultra Super Attacks (18 Ki).")
+    print("Matching color = 2 Ki, others = 1 Ki, Rainbow (R) = 1 Ki.")
+    print("Link Skills: Active when characters with the same link are on the team, give bonuses.")
+    print("Support Items:")
     print(f"- {SupportItem.GHOST_USHER.value}: Delay all opponent attacks for 1 turn (once per battle).")
     print(f"- {SupportItem.ANDROID_8.value}: Recover 70% HP, and all allies' DEF +50% for 2 turns.")
     print(f"- {SupportItem.PRINCESS_SNAKE.value}: Recover 55% HP, damage received -30% for 1 turn.")
     print(f"- {SupportItem.WHIS.value}: Damage received -40% for 2 turns.")
-    print("\n(Other game info here...)")
     BattleSystem.press_any_key()
 
 def start_new_battle():
     enemy_team = Team()
-    vegeta = Character("Super Saiyan God SS Vegeta", Attribute.STR, 12000000, 250, 150000, is_enemy=True)
+    vegeta = Character("Super Saiyan God SS Vegeta", Attribute.STR, 12000000, 370000, 150000, is_enemy=True)
     vegeta.damage_reduction = 66
     vegeta.max_attacks_per_turn = 3
     enemy_team.add_member(vegeta)
