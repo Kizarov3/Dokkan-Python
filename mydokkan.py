@@ -26,11 +26,54 @@ class StatusEffect(Enum):
     EFFECTIVE_ALL = "Effective Against All Types"; DOMAIN = "Domain Active"; OMNIPRESENT = "Omnipresent"
 
 class Category(Enum):
-    WORLDWIDE_CHAOS = "Worldwide Chaos"; POTARA = "Potara"; REALM_OF_GODS = "Realm of Gods"
-    FUSED_FIGHTERS = "Fused Fighters"; TIME_TRAVELERS = "Time Travelers"
-    FINAL_TRUMP_CARD = "Final Trump Card"; FUTURE_SAGA = "Future Saga"
-    SUPER_BOSSES = "Super Bosses"; CORRODED_BODY = "Corroded Body and Mind"
-    ACCELERATED_BATTLE = "Accelerated Battle"; EXPLODING_RAGE = "Exploding Rage"
+    DB_SAGA = "DB Saga"; SAIYAN_SAGA = "Saiyan Saga"; PLANET_NAMEK_SAGA = "Planet Namek Saga"
+    ANDROIDS_CELL_SAGA = "Androids/Cell Saga"; MAJIN_BUU_SAGA = "Majin Buu Saga"
+    FUTURE_SAGA = "Future Saga"; UNIVERSE_SURVIVAL_SAGA = "Universe Survival Saga"
+    SHADOW_DRAGON_SAGA = "Shadow Dragon Saga"; PURE_SAIYANS = "Pure Saiyans"
+    HYBRID_SAIYANS = "Hybrid Saiyans"; EARTHLINGS = "Earthlings"
+    NAMEKIANS = "Namekians"; ANDROIDS = "Androids"
+    ARTIFICIAL_LIFE_FORMS = "Artifical Life Forms"; GOKUS_FAMILY = "Goku's Family"
+    VEGETAS_FAMILY = "Vegeta's Family"; WICKED_BLOODLINE = "Wicked Bloodline"
+    YOUTH = "Youth"; PEPPY_GALS = "Peppy Gals"; SUPER_SAIYANS = "Super Saiyans"
+    SUPER_SAIYAN_2 = "Super Saiyan 2"; SUPER_SAIYAN_3 = "Super Saiyan 3"
+    POWER_BEYOND_SUPER_SAIYAN = "Power Beyond Super Saiyan"; FUSION = "Fusion"
+    POTARA = "Potara"; FUSED_FIGHTERS = "Fused Fighters"; GIANT_FORM = "Giant Form"
+    TRANSFORMATION_BOOST = "Transformation Boost"; POWER_ABSORPTION = "Power Absorption"
+    KAMEHAMEHA = "Kamehameha"; REALM_OF_GODS = "Realm of gods"; FULL_POWER = "Full Power"
+    GIANT_APE_POWER = "Giant Ape Power"; MAJIN_POWER = "Majin Power"
+    UNCONTROLLABLE_POWER = "Uncontrollable Power"; POWERFUL_COMEBACK = "Powerful Comeback"
+    POWER_OF_WISHES = "Power of Wishes"; DEMONIC_POWER = "Demonic Power"
+    MIRACULOUS_AWAKENING = "Mircaulous Awakening"; CORRODED_BODY_AND_MIND = "Corroded Body and Mind"
+    RAPID_GROWTH = "Rapid Growth"; MASTERED_EVOLUTION = "Mastered Evolution"
+    TIME_LIMIT = "Time Limit"; FINAL_TRUMP_CARD = "Final Trump Card"
+    WORTHY_RIVALS = "Worthy Rivals"; SWORN_ENEMIES = "Sworn Enemies"
+    JOINED_FORCES = "Joined Forces"; BOND_OF_PARENT_AND_CHILD = "Bond of Parent and Child"
+    SIBLINGS_BOND = "Siblings' Bond"; BOND_OF_FRIENDSHIP = "Bond of Friendship"
+    BOND_OF_MATER_AND_DISCIPLE = "Bond of Master and Disciple"; GINYU_FORCE = "Ginyu Force"
+    TEAM_BARDOCK = "Team Bardock"; UNIVERSE_6 = "Universe 6"
+    REPRESENTATIVES_OF_UNIVERSE_7 = "Representatives of Universe 7"; UNIVERSE_11 = "Universe 11"
+    GT_HEROES = "GT Heroes"; GT_BOSSES = "GT Bosses"
+    SUPER_HEROES = "Super Heroes"; SUPER_BOSSES = "Super Bosses"
+    MOVIE_HEROES = "Movie Heroes"; MOVIE_BOSSES = "Movie Bosses"
+    TURTLE_SCHOOL = "Turtle School"; WORLD_TORUNAMENT = "World Tournament"
+    TOURNAMENT_PARTICIPANTS = "Tournament Participants"; EARTH_BREAD_FIGHTERS = "Earth-Bread Fighters"
+    LOW_CLASS_WARRIOR = "Low-Class Warriors"; GIFTED_WARRIORS = "Gifted Warriors"
+    OTHERWORLD_WARRIORS = "Otherworld Warriors"; RESURRECTED_WARRIORS = "Resurrected Warriors"
+    SPACE_TRAVELLING_WARRIORS = "Space-Travelling Warriors"; TIME_TRAVELERS = "Time Travelers"
+    DRAGON_BALL_SEEKERS = "Dragon Ball Seekers"; SUCCESSORS = "Successors"
+    STORIED_FIGURES = "Storied Figures"; LEGENDARY_EXISTENCE = "Legendary Existence"
+    SAVIORS = "Saviors"; DEFENDERS_OF_JUSTICE = "Defenders of Justice"
+    EARTH_PROTECTING_HEROES = "Earth-Protecting Heroes"; REVENGE = "Revenge"
+    MISSION_EXECUTION = "Mission Execution"; TARFET_GOKU = "Target: Goku"
+    TERRIFYING_CONQUERORS = "Terrifying Conquerors"; INHUMAN_DEEDS = "Inhuman Deeds"
+    PLANETARY_DESTRUCTION = "Planetary Destruction"; EXPLODING_RAGE = "Exploding Rage"
+    CONNECTED_HOPE = "Connected Hope"; ENTRUSTED_WILL = "Entrusted Will"
+    ALL_OUT_STRUGGLE = "All-Out Struggle"; BATTLE_OF_WITS = "Battle of Wits"
+    ACCELERATED_BATTLE = "Accelerated Battle"; BATTLE_OF_FATE = "Battle of Fate"
+    HEAVENLY_EVENTS = "Heavenly Events"; SPECIAL_POSE = "Special Pose"
+    WORLDWIDE_CHAOS = "Worldwide Chaos"; CROSSOVER = "Crossover"
+    DRAGON_BALL_HEROES = "Dragon Ball Heroes"
+    
 
 class SupportItem(Enum):
     GHOST_USHER = "Ghost Usher"; ANDROID_8 = "Android #8"
@@ -1378,12 +1421,12 @@ def create_goku_black_characters():
     characters.append(Character(
         name="Terrifying Zero Mortals Plan Goku Black (Super Saiyan Rosé) + Zamasu",
         attribute=Attribute.STR,
-        hp=2800000,
-        attack=21000,
-        defense=16000,
+        hp=26363,
+        attack=20335,
+        defense=12875,
         links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith", 
                "Nightmare", "Dismal Future", "Fierce Battle"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS, Category.SUPER_BOSSES],
+        categories=[Category.FUTURE_SAGA, Category.POWER_BEYOND_SUPER_SAIYAN, Category.POTARA, Category.FUSED_FIGHTERS, Category.KAMEHAMEHA, Category.REALM_OF_GODS, Category.POWER_OF_WISHES, Category.CORRODED_BODY_AND_MIND, Category.FINAL_TRUMP_CARD, Category.SUPER_BOSSES, Category.GIFTED_WARRIORS, Category.TIME_TRAVELERS, Category.SUCCESSORS, Category.INHUMAN_DEEDS, Category.ACCELERATED_BATTLE, Category.BATTLE_OF_FATE, Category.WORLDWIDE_CHAOS],
         evasion=EvasionLevel.MEDIUM,
         is_lr=True,
         passive_skills={
@@ -1411,11 +1454,11 @@ def create_goku_black_characters():
     characters.append(Character(
         name="Infinite Sanctuary Fusion Zamasu",
         attribute=Attribute.TEQ,
-        hp=3200000,
-        attack=19000,
-        defense=18000,
+        hp=19588,
+        attack=21270,
+        defense=15294,
         links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        categories=[Category.FUTURE_SAGA, Category.POTARA, Category.FUSED_FIGHTERS, Category.REALM_OF_GODS, Category.POWER_OF_WISHES, Category.FINAL_TRUMP_CARD, Category.SUPER_BOSSES, Category.TIME_TRAVELERS, Category.SUCCESSORS, Category.EXPLODING_RAGE, Category.BATTLE_OF_FATE, Category.WORLDWIDE_CHAOS],
         evasion=EvasionLevel.HIGH,
         is_lr=True,
         passive_skills={
@@ -1444,11 +1487,11 @@ def create_goku_black_characters():
     characters.append(Character(
         name="Dawn of an Ideal World Fusion Zamasu",
         attribute=Attribute.INT,
-        hp=3000000,
-        attack=22000,
-        defense=15000,
+        hp=22750,
+        attack=21210,
+        defense=13488,
         links=["Fused Fighter", "Godly Power", "Big Bad Bosses", "Fear and Faith"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        categories=[Category.FUTURE_SAGA, Category.POTARA, Category.FUSED_FIGHTERS, Category.REALM_OF_GODS, Category.POWER_OF_WISHES, Category.FINAL_TRUMP_CARD, Category.SUPER_BOSSES, Category.TIME_TRAVELERS, Category.SUCCESSORS, Category.BATTLE_OF_FATE, Category.WORLDWIDE_CHAOS],
         evasion=EvasionLevel.MEDIUM,
         is_lr=False,
         passive_skills={
@@ -1476,12 +1519,12 @@ def create_goku_black_characters():
     characters.append(Character(
         name="Mark of Almighty Power Goku Black (Super Saiyan Rosé)",
         attribute=Attribute.INT,
-        hp=2600000,
-        attack=23000,
-        defense=13000,
+        hp=25300,
+        attack=21635,
+        defense=11681,
         links=["Super Saiyan", "Fear and Faith", "Kamehameha", "Dismal Future", 
                "Big Bad Bosses", "Fierce Battle", "Legendary Power"],
-        categories=[Category.FUTURE_SAGA, Category.REALM_OF_GODS],
+        categories = [Category.FUTURE_SAGA, Category.POWER_BEYOND_SUPER_SAIYAN, Category.POTARA, Category.KAMEHAMEHA, Category.REALM_OF_GODS, Category.POWER_OF_WISHES, Category.CORRODED_BODY_AND_MIND, Category.SUPER_BOSSES, Category.TIME_TRAVELERS, Category.SUCCESSORS, Category.INHUMAN_DEEDS, Category.EXPLODING_RAGE, Category.ACCELERATED_BATTLE, Category.WORLDWIDE_CHAOS],
         evasion=EvasionLevel.RARE,
         is_lr=False,
         passive_skills={
@@ -1509,12 +1552,12 @@ def create_goku_black_characters():
     characters.append(Character(
         name="Mastery of the Power of Rage Goku Black (Super Saiyan Rosé)",
         attribute=Attribute.PHY,
-        hp=2700000,
-        attack=24000,
-        defense=14000,
+        hp=15720,
+        attack=15576,
+        defense=13345,
         links=["Super Saiyan", "Big Bad Bosses", "Dismal Future", "Prepared for Battle", 
                "Nightmare", "Fear and Faith", "Fierce Battle"],
-        categories=[Category.SUPER_BOSSES, Category.CORRODED_BODY, Category.REALM_OF_GODS],
+        categories=[Category.FUTURE_SAGA,Category.POWER_BEYOND_SUPER_SAIYAN,Category.POTARA,Category.REALM_OF_GODS,Category.POWER_OF_WISHES,Category.CORRODED_BODY_AND_MIND,Category.SUPER_BOSSES,Category.TIME_TRAVELERS,Category.SUCCESSORS,Category.INHUMAN_DEEDS,Category.EXPLODING_RAGE,Category.ACCELERATED_BATTLE,Category.WORLDWIDE_CHAOS],
         evasion=EvasionLevel.HIGH,
         is_lr=True,
         passive_skills={
