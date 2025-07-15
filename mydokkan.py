@@ -528,27 +528,39 @@ class Team:
     def apply_leader_skill(self, leader):
         initial_max_hp = sum(m.max_hp for m in self.members)
 
+        # Reduced multipliers to more reasonable values
         if "Dawn of an Ideal World" in leader.name:
             for member in self.members:
                 if any(cat in [Category.WORLDWIDE_CHAOS, Category.POTARA] for cat in member.categories):
-                    member.max_hp *= 2.5; member.base_attack *= 2.5; member.base_defense *= 2.5; member.ki += 4
+                    # Reduced multipliers from 2.5 to 1.8
+                    member.max_hp *= 1.8; member.base_attack *= 1.8; member.base_defense *= 1.8; member.ki += 4
         elif "Infinite Sanctuary" in leader.name:
             for member in self.members:
                 if any(cat in [Category.REALM_OF_GODS, Category.WORLDWIDE_CHAOS, Category.FUSED_FIGHTERS] for cat in member.categories):
-                    member.max_hp *= 2.7; member.base_attack *= 2.7; member.base_defense *= 2.7; member.ki += 3
+                    # Reduced multipliers from 2.7 to 1.9
+                    member.max_hp *= 1.9; member.base_attack *= 1.9; member.base_defense *= 1.9; member.ki += 3
                     if any(cat in [Category.TIME_TRAVELERS, Category.FINAL_TRUMP_CARD] for cat in member.categories):
-                         member.max_hp *= 1.3; member.base_attack *= 1.3; member.base_defense *= 1.3
+                         # Reduced multiplier from 1.3 to 1.1
+                         member.max_hp *= 1.1; member.base_attack *= 1.1; member.base_defense *= 1.1
                 elif not any(cat in [Category.REALM_OF_GODS, Category.WORLDWIDE_CHAOS, Category.FUSED_FIGHTERS] for cat in member.categories):
-                    member.max_hp *= 2.5; member.base_attack *= 2.5; member.base_defense *= 2.5; member.ki += 3
+                    # Reduced multiplier from 2.5 to 1.7
+                    member.max_hp *= 1.7; member.base_attack *= 1.7; member.base_defense *= 1.7; member.ki += 3
         # Leader skills for new characters
         elif "Rose Stained" in leader.name:
             for member in self.members:
                 if any(cat in [Category.FUTURE_SAGA, Category.REALM_OF_GODS] for cat in member.categories):
-                    member.max_hp *= 3.0; member.base_attack *= 3.0; member.base_defense *= 2.8; member.ki += 4
+                    # Reduced multipliers from 3.0 to 2.0
+                    member.max_hp *= 2.0; member.base_attack *= 2.0; member.base_defense *= 1.8; member.ki += 4
         elif "Mastery of the Power of Rage" in leader.name:
             for member in self.members:
                 if any(cat in [Category.SUPER_BOSSES, Category.CORRODED_BODY] for cat in member.categories):
-                    member.max_hp *= 3.2; member.base_attack *= 3.2; member.base_defense *= 3.0; member.ki += 4
+                    # Reduced multipliers from 3.2 to 2.2
+                    member.max_hp *= 2.2; member.base_attack *= 2.2; member.base_defense *= 2.0; member.ki += 4
+        elif "Terrifying Zero Mortals Plan" in leader.name:
+            # Added leader skill for this character
+            for member in self.members:
+                if any(cat in [Category.FUTURE_SAGA, Category.REALM_OF_GODS, Category.SUPER_BOSSES] for cat in member.categories):
+                    member.max_hp *= 2.0; member.base_attack *= 2.0; member.base_defense *= 1.8; member.ki += 4
         
         new_max_hp = sum(m.max_hp for m in self.members)
         for member in self.members:
