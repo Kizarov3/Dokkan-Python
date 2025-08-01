@@ -598,7 +598,7 @@ class Team:
             for member in self.members:
                 if any(cat in [Category.SUPER_BOSSES, Category.CORRODED_BODY] for cat in member.categories):
                     # Reduced multipliers from 3.2 to 2.2
-                    member.max_hp *= 3.2; member.base_attack *= 3.2; member.base_defense *= 2.0; member.ki += 4
+                    member.max_hp *= 2.2; member.base_attack *= 2.2; member.base_defense *= 2.0; member.ki += 4
         elif "Terrifying Zero Mortals Plan" in leader.name:
             # Added leader skill for this character
             for member in self.members:
