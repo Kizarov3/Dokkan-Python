@@ -598,7 +598,7 @@ class Team:
             for member in self.members:
                 if any(cat in [Category.SUPER_BOSSES, Category.CORRODED_BODY] for cat in member.categories):
                     # Reduced multipliers from 3.2 to 2.2
-                    member.max_hp *= 2.2; member.base_attack *= 2.2; member.base_defense *= 2.0; member.ki += 4
+                    member.max_hp *= 3.2; member.base_attack *= 3.2; member.base_defense *= 2.0; member.ki += 4
         elif "Terrifying Zero Mortals Plan" in leader.name:
             # Added leader skill for this character
             for member in self.members:
@@ -1374,6 +1374,7 @@ class BattleSystem:
 def main_menu():
     while True:
         BattleSystem.clear_screen()
+        print("Dokkan-Python v1.3")
         print("===== DOKKAN-LIKE BATTLE =====")
         print("1. Start New Battle")
         print("2. View Game Info")
@@ -1617,7 +1618,7 @@ def start_new_battle():
     player_team.add_member(Character(
         name="Fusion Zamasu",
         attribute=Attribute.INT,
-        hp=2300000,
+        hp=16250,
         attack=17000,
         defense=13000,
         links=["Fused Fighter", "Godly Power"],
@@ -1627,7 +1628,7 @@ def start_new_battle():
     player_team.add_member(Character(
         name="Goku Black (Base)",
         attribute=Attribute.PHY,
-        hp=2100000,
+        hp=21323,
         attack=16000,
         defense=11000,
         links=["Prodigies", "Cold Judgment"],
